@@ -1,0 +1,196 @@
+INFO - ---------------Training Configuration-------------
+INFO - batch_size        : 2
+INFO - epochs            : 160
+INFO - lr                : 0.001
+INFO - num_workers       : 4
+INFO - gpu_id            : 0
+INFO - output_dir        : ./output
+INFO - model_ckpt_path   : ./model/ckpt.pth
+INFO - if_load_model     : False
+INFO - if_save_nii       : False
+INFO - if_use_tfm        : False
+INFO - comment           : NONE
+INFO - DatasetDir        : /home/jincan/long_seg/my3DUNet/Data/Imaging/Imaging_new_rig
+INFO - mod               : long
+INFO - save_nii_freq     : 20
+INFO - weight_loss_dice  : 1.0
+INFO - weight_loss_focal : 1.0
+INFO - weight_loss_sim   : 0.0
+INFO - -------------------TRAINING MODEL------------------
+INFO - UNet3D(
+  (encoder1): DoubleConv3D(
+    (conv_block): Sequential(
+      (0): Conv3d(8, 16, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      (1): BatchNorm3d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): ReLU(inplace=True)
+      (3): Dropout(p=0.1, inplace=False)
+      (4): Conv3d(16, 16, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      (5): BatchNorm3d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (6): ReLU(inplace=True)
+    )
+  )
+  (pool1): MaxPool3d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+  (encoder2): DoubleConv3D(
+    (conv_block): Sequential(
+      (0): Conv3d(16, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      (1): BatchNorm3d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): ReLU(inplace=True)
+      (3): Dropout(p=0.1, inplace=False)
+      (4): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      (5): BatchNorm3d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (6): ReLU(inplace=True)
+    )
+  )
+  (pool2): MaxPool3d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+  (encoder3): DoubleConv3D(
+    (conv_block): Sequential(
+      (0): Conv3d(32, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      (1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): ReLU(inplace=True)
+      (3): Dropout(p=0.2, inplace=False)
+      (4): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      (5): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (6): ReLU(inplace=True)
+    )
+  )
+  (pool3): MaxPool3d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+  (encoder4): DoubleConv3D(
+    (conv_block): Sequential(
+      (0): Conv3d(64, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      (1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): ReLU(inplace=True)
+      (3): Dropout(p=0.2, inplace=False)
+      (4): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      (5): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (6): ReLU(inplace=True)
+    )
+  )
+  (pool4): MaxPool3d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+  (bottleneck): DoubleConv3D(
+    (conv_block): Sequential(
+      (0): Conv3d(128, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      (1): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): ReLU(inplace=True)
+      (3): Dropout(p=0.3, inplace=False)
+      (4): Conv3d(256, 256, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      (5): BatchNorm3d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (6): ReLU(inplace=True)
+    )
+  )
+  (upconv4): ConvTranspose3d(256, 128, kernel_size=(2, 2, 2), stride=(2, 2, 2))
+  (decoder4): DoubleConv3D(
+    (conv_block): Sequential(
+      (0): Conv3d(256, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      (1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): ReLU(inplace=True)
+      (3): Dropout(p=0.2, inplace=False)
+      (4): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      (5): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (6): ReLU(inplace=True)
+    )
+  )
+  (upconv3): ConvTranspose3d(128, 64, kernel_size=(2, 2, 2), stride=(2, 2, 2))
+  (decoder3): DoubleConv3D(
+    (conv_block): Sequential(
+      (0): Conv3d(128, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      (1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): ReLU(inplace=True)
+      (3): Dropout(p=0.2, inplace=False)
+      (4): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      (5): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (6): ReLU(inplace=True)
+    )
+  )
+  (upconv2): ConvTranspose3d(64, 32, kernel_size=(2, 2, 2), stride=(2, 2, 2))
+  (decoder2): DoubleConv3D(
+    (conv_block): Sequential(
+      (0): Conv3d(64, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      (1): BatchNorm3d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): ReLU(inplace=True)
+      (3): Dropout(p=0.1, inplace=False)
+      (4): Conv3d(32, 32, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      (5): BatchNorm3d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (6): ReLU(inplace=True)
+    )
+  )
+  (upconv1): ConvTranspose3d(32, 16, kernel_size=(2, 2, 2), stride=(2, 2, 2))
+  (decoder1): DoubleConv3D(
+    (conv_block): Sequential(
+      (0): Conv3d(32, 16, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      (1): BatchNorm3d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): ReLU(inplace=True)
+      (3): Dropout(p=0.1, inplace=False)
+      (4): Conv3d(16, 16, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      (5): BatchNorm3d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (6): ReLU(inplace=True)
+    )
+  )
+  (out_conv): Conv3d(16, 8, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+)
+INFO - ------------------------Over----------------------
+INFO - Epoch: 1, IoU: 0.1124, Dice: ['0.5021', '0.0043', '0.0470', '0.0386'] && [0.1480, 0.0300]
+INFO - [Val] Epoch: 1, IoU: 0.0925, Dice: ['0.3978', '0.0000', '0.0188', '0.0543'] && [0.1177, 0.0243]
+INFO - Model improved and saved at epoch 1
+INFO - Epoch: 2, IoU: 0.1987, Dice: ['0.7803', '0.0056', '0.1381', '0.0478'] && [0.2430, 0.0639]
+INFO - [Val] Epoch: 2, IoU: 0.1815, Dice: ['0.7788', '0.0000', '0.0399', '0.0668'] && [0.2214, 0.0356]
+INFO - Model improved and saved at epoch 2
+INFO - Epoch: 3, IoU: 0.2325, Dice: ['0.8112', '0.0416', '0.2396', '0.0489'] && [0.2853, 0.1100]
+INFO - [Val] Epoch: 3, IoU: 0.2060, Dice: ['0.8073', '0.0000', '0.1581', '0.0321'] && [0.2494, 0.0634]
+INFO - Model improved and saved at epoch 3
+INFO - Epoch: 4, IoU: 0.2651, Dice: ['0.8352', '0.0811', '0.3126', '0.0497'] && [0.3196, 0.1478]
+INFO - [Val] Epoch: 4, IoU: 0.2113, Dice: ['0.8235', '0.0000', '0.0784', '0.0726'] && [0.2436, 0.0504]
+INFO - Epoch: 5, IoU: 0.2818, Dice: ['0.8765', '0.0676', '0.3751', '0.0625'] && [0.3454, 0.1684]
+INFO - [Val] Epoch: 5, IoU: 0.2629, Dice: ['0.8612', '0.0000', '0.2203', '0.0825'] && [0.2910, 0.1009]
+INFO - Model improved and saved at epoch 5
+INFO - Epoch: 6, IoU: 0.3369, Dice: ['0.9689', '0.0541', '0.3824', '0.1813'] && [0.3967, 0.2059]
+INFO - [Val] Epoch: 6, IoU: 0.2796, Dice: ['0.9483', '0.0000', '0.1496', '0.1378'] && [0.3089, 0.0958]
+INFO - Epoch: 7, IoU: 0.3548, Dice: ['0.9831', '0.0811', '0.3511', '0.2148'] && [0.4075, 0.2157]
+INFO - [Val] Epoch: 7, IoU: 0.3097, Dice: ['0.9718', '0.0000', '0.1736', '0.2012'] && [0.3366, 0.1249]
+INFO - Model improved and saved at epoch 7
+INFO - Epoch: 8, IoU: 0.3661, Dice: ['0.9839', '0.0811', '0.3508', '0.2303'] && [0.4115, 0.2207]
+INFO - [Val] Epoch: 8, IoU: 0.2404, Dice: ['0.9247', '0.0000', '0.0891', '0.0613'] && [0.2688, 0.0501]
+INFO - Epoch: 9, IoU: 0.3606, Dice: ['0.9852', '0.0811', '0.3496', '0.2334'] && [0.4123, 0.2214]
+INFO - [Val] Epoch: 9, IoU: 0.3576, Dice: ['0.9818', '0.0000', '0.2881', '0.2725'] && [0.3856, 0.1868]
+INFO - Model improved and saved at epoch 9
+INFO - Epoch: 10, IoU: 0.3599, Dice: ['0.9842', '0.0811', '0.3366', '0.2413'] && [0.4108, 0.2197]
+INFO - [Val] Epoch: 10, IoU: 0.3254, Dice: ['0.9715', '0.0000', '0.1887', '0.2226'] && [0.3457, 0.1371]
+INFO - Epoch: 11, IoU: 0.3739, Dice: ['0.9864', '0.0681', '0.3939', '0.2659'] && [0.4286, 0.2426]
+INFO - [Val] Epoch: 11, IoU: 0.3538, Dice: ['0.9809', '0.0026', '0.2264', '0.2492'] && [0.3648, 0.1594]
+INFO - Epoch: 12, IoU: 0.3665, Dice: ['0.9855', '0.0687', '0.3362', '0.2625'] && [0.4132, 0.2224]
+INFO - [Val] Epoch: 12, IoU: 0.2351, Dice: ['0.8739', '0.0000', '0.0625', '0.1867'] && [0.2808, 0.0831]
+INFO - Epoch: 13, IoU: 0.3725, Dice: ['0.9857', '0.0831', '0.3621', '0.2897'] && [0.4302, 0.2450]
+INFO - [Val] Epoch: 13, IoU: 0.3627, Dice: ['0.9798', '0.0000', '0.1448', '0.4665'] && [0.3978, 0.2038]
+INFO - Model improved and saved at epoch 13
+INFO - Epoch: 14, IoU: 0.4140, Dice: ['0.9868', '0.0557', '0.3868', '0.4495'] && [0.4697, 0.2973]
+INFO - [Val] Epoch: 14, IoU: 0.3875, Dice: ['0.9841', '0.0000', '0.1779', '0.4778'] && [0.4100, 0.2186]
+INFO - Model improved and saved at epoch 14
+INFO - Epoch: 15, IoU: 0.4203, Dice: ['0.9876', '0.0714', '0.3508', '0.4926'] && [0.4756, 0.3049]
+INFO - [Val] Epoch: 15, IoU: 0.4018, Dice: ['0.9828', '0.0000', '0.2041', '0.5564'] && [0.4358, 0.2535]
+INFO - Model improved and saved at epoch 15
+INFO - Epoch: 16, IoU: 0.4118, Dice: ['0.9868', '0.0811', '0.3501', '0.4907'] && [0.4772, 0.3073]
+INFO - [Val] Epoch: 16, IoU: 0.3344, Dice: ['0.9680', '0.0000', '0.2105', '0.3990'] && [0.3944, 0.2032]
+INFO - Epoch: 17, IoU: 0.4124, Dice: ['0.9865', '0.0546', '0.3284', '0.4981'] && [0.4669, 0.2937]
+INFO - [Val] Epoch: 17, IoU: 0.3752, Dice: ['0.9797', '0.0000', '0.1965', '0.4093'] && [0.3964, 0.2020]
+INFO - Epoch: 18, IoU: 0.4384, Dice: ['0.9877', '0.0556', '0.3893', '0.5177'] && [0.4876, 0.3209]
+INFO - [Val] Epoch: 18, IoU: 0.3831, Dice: ['0.9869', '0.0045', '0.1620', '0.4836'] && [0.4092, 0.2167]
+INFO - Epoch: 19, IoU: 0.4241, Dice: ['0.9863', '0.0697', '0.3564', '0.5214'] && [0.4835, 0.3158]
+INFO - [Val] Epoch: 19, IoU: 0.3934, Dice: ['0.9851', '0.0024', '0.2665', '0.4609'] && [0.4287, 0.2433]
+INFO - Epoch: 20, IoU: 0.4403, Dice: ['0.9888', '0.0831', '0.3991', '0.5344'] && [0.5014, 0.3389]
+INFO - [Val] Epoch: 20, IoU: 0.3431, Dice: ['0.9762', '0.0018', '0.2216', '0.3955'] && [0.3988, 0.2063]
+INFO - Epoch: 21, IoU: 0.4280, Dice: ['0.9876', '0.0576', '0.3764', '0.5139'] && [0.4839, 0.3160]
+INFO - [Val] Epoch: 21, IoU: 0.3738, Dice: ['0.9793', '0.0006', '0.2821', '0.4741'] && [0.4340, 0.2523]
+INFO - Epoch: 22, IoU: 0.4398, Dice: ['0.9881', '0.0801', '0.3873', '0.5539'] && [0.5023, 0.3404]
+INFO - [Val] Epoch: 22, IoU: 0.3472, Dice: ['0.9825', '0.0039', '0.2208', '0.3796'] && [0.3967, 0.2014]
+INFO - Epoch: 23, IoU: 0.4505, Dice: ['0.9895', '0.0833', '0.3932', '0.5449'] && [0.5027, 0.3405]
+INFO - [Val] Epoch: 23, IoU: 0.3502, Dice: ['0.9770', '0.0206', '0.1010', '0.4801'] && [0.3947, 0.2005]
+INFO - Epoch: 24, IoU: 0.4567, Dice: ['0.9890', '0.1026', '0.3935', '0.5397'] && [0.5062, 0.3452]
+INFO - [Val] Epoch: 24, IoU: 0.3969, Dice: ['0.9855', '0.0013', '0.2776', '0.5279'] && [0.4481, 0.2689]
+INFO - Model improved and saved at epoch 24
+INFO - Epoch: 25, IoU: 0.4418, Dice: ['0.9883', '0.0843', '0.4145', '0.5386'] && [0.5064, 0.3458]
+INFO - [Val] Epoch: 25, IoU: 0.3703, Dice: ['0.9836', '0.0200', '0.1480', '0.5118'] && [0.4159, 0.2266]
+INFO - Epoch: 26, IoU: 0.4412, Dice: ['0.9894', '0.1060', '0.4109', '0.5443'] && [0.5126, 0.3537]
+INFO - [Val] Epoch: 26, IoU: 0.3786, Dice: ['0.9853', '0.0307', '0.1713', '0.4990'] && [0.4216, 0.2337]
+INFO - Epoch: 27, IoU: 0.4564, Dice: ['0.9892', '0.1119', '0.4025', '0.5621'] && [0.5164, 0.3588]
+INFO - [Val] Epoch: 27, IoU: 0.3682, Dice: ['0.9759', '0.0414', '0.2809', '0.4534'] && [0.4379, 0.2586]
+INFO - Epoch: 28, IoU: 0.4630, Dice: ['0.9900', '0.1243', '0.4258', '0.5579'] && [0.5245, 0.3693]
+INFO - [Val] Epoch: 28, IoU: 0.3756, Dice: ['0.9844', '0.0149', '0.1783', '0.5058'] && [0.4208, 0.2330]

@@ -369,9 +369,9 @@ def crop_to_multiple_of_16(array, mod='single_seg'):
     return cropped_array, crop_offsets
 
 
-def save_pred_nii_simple(pred, epoch, path_folder, affine=None, crop_offsets=None, mod='single_seg'):
+def save_pred_nii_simple(pred, epoch, path_folder, affine=None, crop_offsets=None, mod='single'):
 
-    if mod == 'single_seg':
+    if mod == 'single':
         for i in range(pred.shape[0]):
             # 1. 转换 logits 为分类标签 (假设 argmax 方式进行多分类)
             # 假设 pred 大小为 (B=1, C=1, D, H, W)，我们去掉 batch 维度和 channel 维度

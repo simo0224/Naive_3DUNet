@@ -396,26 +396,24 @@ def save_pred_nii_simple(pred, epoch, path_folder, affine=None, crop_offsets=Non
         pred: a list of 2 tp logits, each logit is (B, C=4, D, H, W)
         path_folder: a list of sublist, each sublist contains 2 tp folder_names
         '''
-        assert pred[0].shape[0] == len(path_folder), "pred and path_folder should have the same length"
+        assert pred.shape[0] == len(path_folder), "pred and path_folder should have the same length"
 
         # 3. 创建保存路径，文件名为 "pred_{epoch}.nii.gz"
-        for j in range(len(pred)):
-            pred_numpy_j = pred[j]  # 得到单个tp的 (B, C, D, H, W)，j表示tp顺序，i表示batch顺序
-            pred_numpy_j = torch.argmax(torch.softmax(pred_numpy_j, dim=1), dim=1)  # 对 C 维度执行 argmax，得到 (B, D, H, W)
-            pred_numpy_j = pred_numpy_j.cpu().numpy().astype(np.int32)  # 转为 numpy 数组，并确保它在 CPU 上
+        pred_numpy_j = torch.argmax(torch.softmax(pred, dim=1), dim=1)  # 对 C 维度执行 argmax，得到 (B, D, H, W)
+        pred_numpy_j = pred_numpy_j.cpu().numpy().astype(np.int32)  # 转为 numpy 数组，并确保它在 CPU 上
+        
+        for i in range(pred_numpy_j.shape[0]):
+            pred_j_i = pred_numpy_j[i]
+            file_name = f"pred_{epoch}.nii.gz"
+            file_path = os.path.join(path_folder[i][1], file_name)
             
-            for i in range(pred_numpy_j.shape[0]):
-                pred_j_i = pred_numpy_j[i]
-                file_name = f"pred_{epoch}.nii.gz"
-                file_path = os.path.join(path_folder[i][j], file_name)
-                
-                if affine is None:
-                    affine_j_i = np.eye(4)
-                else:
-                    affine_j_i = affine[i][j]
-                if crop_offsets:
-                    crop_offsets_i = crop_offsets[i][j]
-                save_nii(pred_j_i, affine_j_i, file_path, crop_offsets_i)
+            if affine is None:
+                affine_j_i = np.eye(4)
+            else:
+                affine_j_i = affine[i][1]
+            if crop_offsets:
+                crop_offsets_i = crop_offsets[i][1]
+            save_nii(pred_j_i, affine_j_i, file_path, crop_offsets_i)
 
 
 def save_nii_simple(pred, path_folder, aug_type=None, isMask=False, affine=None, crop_offsets=None):

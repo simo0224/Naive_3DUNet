@@ -136,12 +136,13 @@ class UNet3D(nn.Module):
     
 
         outputs = self.out_conv(d1)
-        if self.mod == 'long':
-            ch_len = outputs.shape[1] // 2
-            output1 = outputs[:,:ch_len,::]
-            output2 = outputs[:,ch_len:,::]
-            return [output1, output2]
-        else:
-            return outputs
+        # if self.mod == 'long':
+        #     ch_len = outputs.shape[1] // 2
+        #     output1 = outputs[:,:ch_len,::]
+        #     output2 = outputs[:,ch_len:,::]
+        #     return [output1, output2]
+        # else:
+
+        return outputs
 
     

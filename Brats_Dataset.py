@@ -20,8 +20,8 @@ class BratsDataset(Dataset):
         if mod == 'single':
             self.img_list = sorted(glob.glob(os.path.join(data_dir, "**", "CT1_image_rig.nii.gz"), recursive=True))
             self.mask_list = sorted(glob.glob(os.path.join(data_dir, "**", "ct1_seg_mask_rig.nii.gz"), recursive=True))
-            self.img_list = self.img_list[::2]
-            self.mask_list = self.mask_list[::2]
+            self.img_list = self.img_list[1::2]
+            self.mask_list = self.mask_list[1::2]
         elif mod == 'long':
             self.data_dir = data_dir
             self.pat_list = sorted(os.listdir(self.data_dir))

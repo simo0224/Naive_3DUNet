@@ -67,7 +67,7 @@ logging.info(f"Total Val Samples: {len(val_dataset)}")
 
 ## initialize model
 F_LOSS = F_loss()
-model = UNet3D(opt, 8 if opt.mod=='long' else 4, 8 if opt.mod=='long' else 4, device=DEVICE)
+model = UNet3D(opt, 8 if opt.mod=='long' else 4, 4, device=DEVICE)
 model_info_recording(logger, model)
 optimizer = torch.optim.AdamW(
    model.parameters(),

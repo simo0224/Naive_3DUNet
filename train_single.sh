@@ -3,7 +3,7 @@ BATCH_SIZE=4
 EPOCHS=160
 LR=0.001
 NUM_WORKERS=4
-GPU_ID=2
+GPU_ID=7
 OUTPUT_DIR="./output"
 # DATA_DIR="/home/jincan/long_seg/my3DUNet/Data/Brats2024/Brats_Data/Train_split"
 # DATA_DIR="/home/jincan/long_seg/my3DUNet/Data/Imaging/Imaging_for_3DUNet_single_new"
@@ -24,6 +24,6 @@ python train.py \
     --weight_loss_focal 1 \
     --output_dir $OUTPUT_DIR \
     --weight_loss_sim 0 \
-    # --if_save_nii \
-    # --save_nii_freq 40 \
+    --if_save_nii \
+    --save_nii_freq 40 \
     # --if_load_model \

@@ -23,7 +23,7 @@ python train.py \
     --weight_loss_dice 1.0 \
     --weight_loss_focal 1.0 \
     --weight_loss_sim 0.0 \
-    # --if_save_nii \
-    # --save_nii_freq 40 \
+    --if_save_nii \
+    --save_nii_freq 40 \
     # --if_load_model \
     # --if_use_tfm \

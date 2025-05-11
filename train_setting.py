@@ -48,14 +48,8 @@ def train_one_epoch(
 
         clsfy_out = output_dict
         if opt.mod == 'long':
-            tp1_pred = clsfy_out[0]
-            tp2_pred = clsfy_out[1]
-            tp1_target = target[:,0,::]
             tp2_target = target[:,1,::]
-            loss_dice1, loss_focus1 = criterion(tp1_pred, tp1_target)
-            loss_dice2, loss_focus2 = criterion(tp2_pred, tp2_target)
-            loss_dice = (loss_dice1 + loss_dice2)/2
-            loss_focus = (loss_focus1 + loss_focus2)/2
+            loss_dice, loss_focus = criterion(clsfy_out, tp2_target)
         else:
             loss_dice, loss_focus = criterion(clsfy_out, target)
         loss = 0.5*loss_dice + 0.5*loss_focus
@@ -70,31 +64,20 @@ def train_one_epoch(
 
 
             if opt.mod == 'long':
-                tp1_pred_idx = tp1_pred.argmax(dim=1)
-                tp2_pred_idx = tp2_pred.argmax(dim=1)
+                pred_idx = clsfy_out.argmax(dim=1)
                 tp, fp, fn, tn = smp.metrics.get_stats(
-                    tp1_pred_idx, tp1_target, mode='multiclass', num_classes=num_classes
+                    pred_idx, tp2_target, mode='multiclass', num_classes=num_classes
                 )
-                metric_macro1 = smp.metrics.iou_score(tp, fp, fn, tn, reduction='macro')
-                tp, fp, fn, tn = smp.metrics.get_stats(
-                    tp2_pred_idx, tp2_target, mode='multiclass', num_classes=num_classes
-                )
-                metric_macro2 = smp.metrics.iou_score(tp, fp, fn, tn, reduction='macro')
-                metric_macro = (metric_macro1 + metric_macro2) / 2
+                metric_macro = smp.metrics.iou_score(tp, fp, fn, tn, reduction='macro')
             else:
                 pred_idx = clsfy_out.argmax(dim=1)
                 tp, fp, fn, tn = smp.metrics.get_stats(
                     pred_idx, target, mode='multiclass', num_classes=num_classes
                 )
                 metric_macro = smp.metrics.iou_score(tp, fp, fn, tn, reduction='macro')
+
             if opt.mod == 'long':
-                # tp1_pred = clsfy_out[0]
-                # tp2_pred = clsfy_out[1]
-                # tp1_target = target[:,0,::]
-                # tp2_target = target[:,1,::]
-                dice_score1 = cal_diceMetric_new(tp1_pred, tp1_target, 4, mod=opt.mod)
-                dice_score2 = cal_diceMetric_new(tp2_pred, tp2_target, 4, mod=opt.mod)
-                dice_score_0 = (dice_score1 + dice_score2) / 2
+                dice_score_0 = cal_diceMetric_new(clsfy_out, tp2_target, 4, mod=opt.mod)
             else:
                 dice_score_0 = cal_diceMetric_new(clsfy_out, target, 4, mod=opt.mod)
 
@@ -162,29 +145,17 @@ def validate(
 
         clsfy_out = output_dict
         if opt.mod == 'long':
-            tp1_pred = clsfy_out[0]
-            tp2_pred = clsfy_out[1]
-            tp1_target = target[:,0,::]
             tp2_target = target[:,1,::]
-            loss_dice1, loss_focus1 = criterion(tp1_pred, tp1_target)
-            loss_dice2, loss_focus2 = criterion(tp2_pred, tp2_target)
-            loss_dice = (loss_dice1 + loss_dice2)/2
-            loss_focus = (loss_focus1 + loss_focus2)/2
+            loss_dice, loss_focus = criterion(clsfy_out, tp2_target)
         else:
             loss_dice, loss_focus = criterion(clsfy_out, target)
 
         if opt.mod == 'long':
-            tp1_pred_idx = tp1_pred.argmax(dim=1)
-            tp2_pred_idx = tp2_pred.argmax(dim=1)
+            pred_idx = clsfy_out.argmax(dim=1)
             tp, fp, fn, tn = smp.metrics.get_stats(
-                tp1_pred_idx, tp1_target, mode='multiclass', num_classes=num_classes
+                pred_idx, tp2_target, mode='multiclass', num_classes=num_classes
             )
-            metric_macro1 = smp.metrics.iou_score(tp, fp, fn, tn, reduction='macro')
-            tp, fp, fn, tn = smp.metrics.get_stats(
-                tp2_pred_idx, tp2_target, mode='multiclass', num_classes=num_classes
-            )
-            metric_macro2 = smp.metrics.iou_score(tp, fp, fn, tn, reduction='macro')
-            metric_macro = (metric_macro1 + metric_macro2) / 2
+            metric_macro = smp.metrics.iou_score(tp, fp, fn, tn, reduction='macro')
         else:
             pred_idx = clsfy_out.argmax(dim=1)
             tp, fp, fn, tn = smp.metrics.get_stats(
@@ -194,13 +165,7 @@ def validate(
 
         # 计算 Dice
         if opt.mod == 'long':
-            # tp1_pred = clsfy_out[0]
-            # tp2_pred = clsfy_out[1]
-            # tp1_target = target[:,0,::]
-            # tp2_target = target[:,1,::]
-            dice_score1 = cal_diceMetric_new(tp1_pred, tp1_target, 4, mod=opt.mod)
-            dice_score2 = cal_diceMetric_new(tp2_pred, tp2_target, 4, mod=opt.mod)
-            dice_score_0 = (dice_score1 + dice_score2) / 2
+            dice_score_0 = cal_diceMetric_new(clsfy_out, tp2_target, 4, mod=opt.mod)
         else:
             dice_score_0 = cal_diceMetric_new(clsfy_out, target, 4, mod=opt.mod)
         for i in range(4):

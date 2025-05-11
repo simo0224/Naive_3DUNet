@@ -135,7 +135,7 @@ class BratsDataset(Dataset):
             save_path_nii = os.path.join(self.path_log,  'niiData', sub_folder, pat_name, week_name)
             os.makedirs(save_path_nii, exist_ok=True)
             if self.opt.if_save_nii:
-                save_nii_simple(image, save_path_nii, isMask=False, affine=image_affine, crop_offsets=im_crop_idx)
+                save_nii_simple(image[0], save_path_nii, isMask=False, affine=image_affine, crop_offsets=im_crop_idx)
                 save_nii_simple(mask, save_path_nii, isMask=True, affine=mask_affine, crop_offsets=mask_crop_idx)
             
             # Normalize the image if normalization is enabled
@@ -144,7 +144,6 @@ class BratsDataset(Dataset):
             
             return image, mask, mask_affine, save_path_nii, mask_crop_idx, tp_name
         else:
-
             #### get the neighbored data
             tp_img_dir = self.pair_img_list[idx]
             tp_mask_dir = self.pair_mask_list[idx]
@@ -174,9 +173,9 @@ class BratsDataset(Dataset):
             if self.opt.if_save_nii:
                 os.makedirs(save_path_nii1, exist_ok=True)
                 os.makedirs(save_path_nii2, exist_ok=True)
-                save_nii_simple(image1, save_path_nii1, isMask=False, affine=image1_affine, crop_offsets=im1_crop_idx)
+                save_nii_simple(image1[0], save_path_nii1, isMask=False, affine=image1_affine, crop_offsets=im1_crop_idx)
                 save_nii_simple(mask1, save_path_nii1, isMask=True, affine=mask1_affine, crop_offsets=mask1_crop_idx)
-                save_nii_simple(image2, save_path_nii2, isMask=False, affine=image2_affine, crop_offsets=im2_crop_idx)
+                save_nii_simple(image2[0], save_path_nii2, isMask=False, affine=image2_affine, crop_offsets=im2_crop_idx)
                 save_nii_simple(mask2, save_path_nii2, isMask=True, affine=mask2_affine, crop_offsets=mask2_crop_idx)
             
             if self.normalization:

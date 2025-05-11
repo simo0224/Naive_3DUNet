@@ -56,14 +56,13 @@ train_dir = os.path.join(opt.DatasetDir, "train")
 val_dir = os.path.join(opt.DatasetDir, "val")
 train_dataset = BratsDataset(opt, path_log, train_dir, normalization=True, isTrain=True, mod=opt.mod)
 val_dataset = BratsDataset(opt, path_log, val_dir, normalization=True, isTrain=False, mod=opt.mod)
-print(f"Data set size: {len(train_dataset)}")
 train_loader = DataLoader(train_dataset, batch_size = bs, shuffle = True, num_workers = opt.num_workers, collate_fn=custom_collate_fn)
 val_loader = DataLoader(val_dataset, batch_size = bs, shuffle = False, num_workers = opt.num_workers, collate_fn=custom_collate_fn)
-   
+
 
 # Print dataset statistics
-print("Total Training Samples: ", len(train_dataset))
-print("Total Val Samples: ", len(val_dataset))
+logging.info(f"Total Training Samples: {len(train_dataset)}")
+logging.info(f"Total Val Samples: {len(val_dataset)}")
 
 
 ## initialize model

@@ -398,14 +398,11 @@ def save_pred_nii_simple(pred, epoch, path_folder, affine=None, crop_offsets=Non
         '''
         assert pred[0].shape[0] == len(path_folder), "pred and path_folder should have the same length"
 
-        pred_labels = torch.argmax(torch.softmax(pred, dim=1), dim=1)  # 对 C 维度执行 argmax，得到 (B, D, H, W)
-        
-        # 2. 将张量转换为 NumPy 数组，并确保它在 CPU 上
-        pred_numpy = pred_labels.cpu().numpy().astype(np.int32)
-        
         # 3. 创建保存路径，文件名为 "pred_{epoch}.nii.gz"
         for j in range(len(pred)):
             pred_numpy_j = pred[j]  # 得到单个tp的 (B, C, D, H, W)，j表示tp顺序，i表示batch顺序
+            pred_numpy_j = torch.argmax(torch.softmax(pred_numpy_j, dim=1), dim=1)  # 对 C 维度执行 argmax，得到 (B, D, H, W)
+            pred_numpy_j = pred_numpy_j.cpu().numpy().astype(np.int32)  # 转为 numpy 数组，并确保它在 CPU 上
             
             for i in range(pred_numpy_j.shape[0]):
                 pred_j_i = pred_numpy_j[i]

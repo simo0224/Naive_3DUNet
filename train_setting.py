@@ -64,6 +64,7 @@ def train_one_epoch(
 
         with torch.no_grad():
             if (epoch_idx % opt.save_nii_freq == 0 and epoch_idx != 0) or (epoch_idx == total_epochs - 1):
+            # if True:
                 if opt.if_save_nii:
                     save_pred_nii_simple(clsfy_out, epoch_idx, save_path_nii, mask_affines, mask_crop_idx, mod=opt.mod)
 
@@ -155,6 +156,7 @@ def validate(
         with torch.no_grad():
             output_dict = model(data)
             if (epoch_idx % opt.save_nii_freq == 0 and epoch_idx != 0) or (epoch_idx == total_epochs - 1):
+            # if True:
                 if opt.if_save_nii:
                     save_pred_nii_simple(output_dict, epoch_idx, save_path_nii, mask_affines, mask_crop_idx, mod=opt.mod)
 

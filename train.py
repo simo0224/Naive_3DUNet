@@ -27,6 +27,7 @@ from config import *
 from utils import *
 from Brats_Dataset import *
 import datetime
+from polylr import PolyLRScheduler
 
 import torch, gc
 gc.collect()
@@ -67,7 +68,7 @@ logging.info(f"Total Val Samples: {len(val_dataset)}")
 
 ## initialize model
 F_LOSS = F_loss()
-model = UNet3D(opt, 8 if opt.mod=='long' else 4, 4, device=DEVICE)
+model = UNet3D(opt, 1, opt.num_class, device=DEVICE)
 model_info_recording(logger, model)
 optimizer = torch.optim.AdamW(
    model.parameters(),
@@ -76,7 +77,7 @@ optimizer = torch.optim.AdamW(
    amsgrad=True  # Optional AMSGrad variant
 )
 
-sche_cos = CosineAnnealingLR(optimizer, T_max=opt.epochs, eta_min=opt.lr*0.01)  # 最小学习率调高一点
+sche_cos = PolyLRScheduler(optimizer, opt.lr, opt.epochs)  # 最小学习率调高一点
 
 if opt.if_load_model:
    print("Loading model and optimizer state...")
@@ -100,6 +101,7 @@ total_epochs = opt.epochs
 if_recorded = False
 for epoch in range(total_epochs):
    current_epoch = epoch + 1
+   logging.info(f"Current learning rate: {np.round(optimizer.param_groups[0]['lr'], decimals=5)}")
 
    # Train one epoch
    

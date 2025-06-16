@@ -143,7 +143,7 @@ def save_dice_plot(data, output_dir, isTrain=True):
 
     # 绘图
     plt.figure(figsize=(10, 6))
-    for i in range(4):
+    for i in range(data.shape[1]):
         plt.plot(epochs, data[:, i], label=f'Class {i}')
 
     plt.xlabel('Epoch')
@@ -348,8 +348,8 @@ def crop_to_multiple_of_16(array, mod='single_seg'):
         # cropped_shape = tuple([96,96,96])
         # cropped_shape = tuple([64,64,64])
     elif mod == 'single_seg':
-        cropped_shape = tuple([128,128,128])
-        # cropped_shape = tuple([144,160,160])
+        # cropped_shape = tuple([128,128,128])
+        cropped_shape = tuple([144,256,256])
         # cropped_shape = tuple([96,96,96])
     else:
         raise ValueError("mod should be 'long_seg' or 'single_seg'")

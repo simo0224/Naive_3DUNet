@@ -8,6 +8,7 @@ def get_config():
     parser.add_argument('--epochs', type=int, default=100, help='Number of training epochs')
     parser.add_argument('--lr', type=float, default=1e-4, help='Learning rate')
     parser.add_argument('--num_workers', type=int, default=4, help='Number of data loading workers')
+    parser.add_argument('--num_class', type=int, default=2, help='class number')
     parser.add_argument('--gpu_id', type=int, default=0, help='GPU ID to use')
     parser.add_argument('--output_dir', type=str, default="./output", help='Directory to save logging')
     parser.add_argument('--model_ckpt_path', type=str, default="./model/ckpt.pth", help='model ckpt path')

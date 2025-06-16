@@ -24,7 +24,7 @@ def train_one_epoch(
 
     loss_dice_record, loss_focus_record = MeanMetric(), MeanMetric()
     metric_record = MeanMetric()
-    dice_record = [MeanMetric() for _ in range(4)]
+    dice_record = [MeanMetric() for _ in range(opt.num_class)]
 
     loader_len = len(loader)
 
@@ -77,11 +77,11 @@ def train_one_epoch(
                 metric_macro = smp.metrics.iou_score(tp, fp, fn, tn, reduction='macro')
 
             if opt.mod == 'long':
-                dice_score_0 = cal_diceMetric_new(clsfy_out, tp2_target, 4, mod=opt.mod)
+                dice_score_0 = cal_diceMetric_new(clsfy_out, tp2_target, opt.num_class, mod=opt.mod)
             else:
-                dice_score_0 = cal_diceMetric_new(clsfy_out, target, 4, mod=opt.mod)
+                dice_score_0 = cal_diceMetric_new(clsfy_out, target, opt.num_class, mod=opt.mod)
 
-            for i in range(4):
+            for i in range(opt.num_class):
                 dice_record[i].update(dice_score_0[i], weight=data.shape[0])
             loss_dice_record.update(loss_dice.detach().cpu(), weight=data.shape[0])
             loss_focus_record.update(loss_focus.detach().cpu(), weight=data.shape[0])
@@ -126,7 +126,7 @@ def validate(
     
     loss_dice_record, loss_focus_record = MeanMetric(), MeanMetric()
     metric_record = MeanMetric()
-    dice_record = [MeanMetric() for _ in range(4)]
+    dice_record = [MeanMetric() for _ in range(opt.num_class)]
  
     loader_len = len(loader)
     
@@ -165,10 +165,10 @@ def validate(
 
         # 计算 Dice
         if opt.mod == 'long':
-            dice_score_0 = cal_diceMetric_new(clsfy_out, tp2_target, 4, mod=opt.mod)
+            dice_score_0 = cal_diceMetric_new(clsfy_out, tp2_target, opt.num_class, mod=opt.mod)
         else:
-            dice_score_0 = cal_diceMetric_new(clsfy_out, target, 4, mod=opt.mod)
-        for i in range(4):
+            dice_score_0 = cal_diceMetric_new(clsfy_out, target, opt.num_class, mod=opt.mod)
+        for i in range(opt.num_class):
             dice_record[i].update(dice_score_0[i], weight=data.shape[0])
         
         loss_dice_record.update(loss_dice.detach().cpu(), weight=data.shape[0])

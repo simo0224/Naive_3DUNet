@@ -3,9 +3,9 @@ BATCH_SIZE=2
 EPOCHS=160
 LR=0.001
 NUM_WORKERS=4
-GPU_ID=0
+GPU_ID=3
 OUTPUT_DIR="./output"
-DATA_DIR="/home/jincan/long_seg/my3DUNet/Data/Imaging/Imaging_new_rig"
+DATA_DIR="/home/jincan/long_seg/my3DUNet/Data/Imaging_data/Combined_Imaging"
 
 # 启动训练脚本
 # CUDA_VISIBLE_DEVICES=1
@@ -24,6 +24,6 @@ python train.py \
     --weight_loss_focal 1.0 \
     --weight_loss_sim 0.0 \
     --if_save_nii \
-    --save_nii_freq 40 \
+    --save_nii_freq 1 \
     # --if_load_model \
     # --if_use_tfm \

@@ -18,8 +18,10 @@ class BratsDataset(Dataset):
         self.path_log = path_log
         self.mod = mod
         if mod == 'single':
-            self.img_list = sorted(glob.glob(os.path.join(data_dir, "**", "CT1_image_rig.nii.gz"), recursive=True))
-            self.mask_list = sorted(glob.glob(os.path.join(data_dir, "**", "ct1_seg_mask_rig.nii.gz"), recursive=True))
+            # self.img_list = sorted(glob.glob(os.path.join(data_dir, "**", "CT1_image_rig.nii.gz"), recursive=True))
+            # self.mask_list = sorted(glob.glob(os.path.join(data_dir, "**", "ct1_seg_mask_rig.nii.gz"), recursive=True))
+            self.img_list = sorted(glob.glob(os.path.join(data_dir, "**", "GED4_new.nii.gz"), recursive=True))
+            self.mask_list = sorted(glob.glob(os.path.join(data_dir, "**", "mask_GED4_new.nii.gz"), recursive=True))
             self.img_list = self.img_list[1::2]
             self.mask_list = self.mask_list[1::2]
         elif mod == 'long':
@@ -121,14 +123,17 @@ class BratsDataset(Dataset):
             image_path = self.img_list[idx]
             mask_path = self.mask_list[idx]
             # Load the image and mask
-            image, image_affine = self.get_4_modality(image_path) ## [1, D, H, W]
-            image, im_crop_idx = crop_to_multiple_of_16(image)
+            image, image_affine = self.load_file(image_path, if_image=True) ## [1, D, H, W]
+            # mask, mask_affine = self.load_file(mask_path, if_image=False) ## [1, D, H, W]
+            # image, im_crop_idx = crop_to_multiple_of_16(image)
+            im_crop_idx = [0,0,0]
             tp_name = self.mask_list[idx][:-11]
             mask, mask_affine = self.load_file(mask_path, if_image=False) ## [1, D, H, W]
-            mask, mask_crop_idx = crop_to_multiple_of_16(mask)
+            # mask, mask_crop_idx = crop_to_multiple_of_16(mask)
+            mask_crop_idx = [0,0,0]
             
         
-            image = torch.from_numpy(image) # Shape: C, D, H, W
+            image = torch.from_numpy(image).unsqueeze(0) # Shape: C, D, H, W
             mask = torch.from_numpy(mask).squeeze()  # Shape: D, H, W
 
             sub_folder = 'train' if self.isTrain else 'val'
@@ -137,7 +142,7 @@ class BratsDataset(Dataset):
             save_path_nii = os.path.join(self.path_log,  'niiData', sub_folder, pat_name, week_name)
             os.makedirs(save_path_nii, exist_ok=True)
             if self.opt.if_save_nii:
-                save_nii_simple(image[0], save_path_nii, isMask=False, affine=image_affine, crop_offsets=im_crop_idx)
+                save_nii_simple(image, save_path_nii, isMask=False, affine=image_affine, crop_offsets=im_crop_idx)
                 save_nii_simple(mask, save_path_nii, isMask=True, affine=mask_affine, crop_offsets=mask_crop_idx)
             
             # Normalize the image if normalization is enabled

@@ -4,6 +4,7 @@ from loss import Pairwise_Feature_Similarity
 from pytorch_patched_decoder import PatchedTimeSeriesDecoder
 # import timesfm_local as timesfm
 import logging
+import torch.nn.functional as F
 
 # Define the Projector class
 class Projector(nn.Module):
@@ -94,7 +95,7 @@ class UNet3D(nn.Module):
 
         self.mod = opt.mod
 
-    def forward(self, x):
+    def forward(self, x, need_inter=False):
         
         #################
         #### Encoder ####
@@ -142,6 +143,8 @@ class UNet3D(nn.Module):
         #     output2 = outputs[:,ch_len:,::]
         #     return [output1, output2]
         # else:
+        if need_inter:
+            outputs = F.interpolate(outputs, scale_factor=2, mode='trilinear', align_corners=True)
 
         return outputs
 

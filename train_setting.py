@@ -37,11 +37,15 @@ def train_one_epoch(
         data, target = data.to(device).float(), target.to(device).long()
         print(f"input data.shape: {data.shape}")
         print(f"input mask.shape: {target.shape}")
+
+        need_inter = False
+        if np.prod(data.shape) != np.prod(target.shape):
+            need_inter = True
         # print(f"data.shape: {data.shape}") ## [B, C, D, H, W]
         # print(f"target.shape: {target.shape}") ## [B, D, H, W]
         optimizer.zero_grad()
 
-        output_dict = model(data)
+        output_dict = model(data, need_inter)
         # print(f"output logits.shape: {output_dict.shape}") ## [B, C, D*2, H, W]
 
         # target = target.argmax(dim=1)  # one-hot to class index
@@ -137,7 +141,11 @@ def validate(
         data, target = data.to(device).float(), target.to(device).long()
 
         with torch.no_grad():
-            output_dict = model(data)
+            need_inter = False
+            if np.prod(data.shape) != np.prod(target.shape):
+                need_inter = True
+
+            output_dict = model(data, need_inter)
             if (epoch_idx % opt.save_nii_freq == 0 and epoch_idx != 0) or (epoch_idx == total_epochs - 1):
             # if True:
                 if opt.if_save_nii:

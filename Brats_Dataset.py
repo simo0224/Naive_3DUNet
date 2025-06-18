@@ -10,6 +10,24 @@ from utils import crop_to_multiple_of_16, save_nii_simple
 import SimpleITK as sitk
 import glob
 
+def center_crop_3d(image, crop_size):
+    """对3D图像在XYZ轴上进行中心裁剪"""
+    assert image.ndim == 3 or image.ndim == 4, "必须是3D或带通道的4D图像"
+    
+    if image.ndim == 4:
+        c, x, y, z = image.shape
+        cropped = image[:, 
+                        x//2 - crop_size[0]//2 : x//2 + crop_size[0]//2,
+                        y//2 - crop_size[1]//2 : y//2 + crop_size[1]//2,
+                        z//2 - crop_size[2]//2 : z//2 + crop_size[2]//2]
+    else:
+        x, y, z = image.shape
+        cropped = image[
+                        x//2 - crop_size[0]//2 : x//2 + crop_size[0]//2,
+                        y//2 - crop_size[1]//2 : y//2 + crop_size[1]//2,
+                        z//2 - crop_size[2]//2 : z//2 + crop_size[2]//2]
+    return cropped
+
 class BratsDataset(Dataset):
     def __init__(self, opt, path_log, data_dir, normalization=True, isTrain=True, mod='single'):
         super().__init__()
@@ -20,8 +38,8 @@ class BratsDataset(Dataset):
         if mod == 'single':
             # self.img_list = sorted(glob.glob(os.path.join(data_dir, "**", "CT1_image_rig.nii.gz"), recursive=True))
             # self.mask_list = sorted(glob.glob(os.path.join(data_dir, "**", "ct1_seg_mask_rig.nii.gz"), recursive=True))
-            self.img_list = sorted(glob.glob(os.path.join(data_dir, "**", "GED4_new.nii.gz"), recursive=True))
-            self.mask_list = sorted(glob.glob(os.path.join(data_dir, "**", "mask_GED4_new.nii.gz"), recursive=True))
+            self.img_list = sorted(glob.glob(os.path.join(data_dir, "**", "GED4.nii.gz"), recursive=True))
+            self.mask_list = sorted(glob.glob(os.path.join(data_dir, "**", "mask_GED4.nii.gz"), recursive=True))
             self.img_list = self.img_list[1::2]
             self.mask_list = self.mask_list[1::2]
         elif mod == 'long':
@@ -56,11 +74,28 @@ class BratsDataset(Dataset):
             temp_image_t1ce = scaler.fit_transform(
                 temp_image_t1ce.reshape(-1, temp_image_t1ce.shape[-1])
             ).reshape(temp_image_t1ce.shape)
+
+            total_size = np.prod(temp_image_t1ce.shape)
+            if (total_size > 1e7):
+                temp_image_t1ce = F.interpolate(
+                    torch.tensor(temp_image_t1ce).unsqueeze(0).unsqueeze(0), 
+                    scale_factor = 0.5, 
+                    mode='trilinear', 
+                    align_corners=False
+                ).squeeze().numpy()
+            # crop_size = tuple(s // 2 for s in temp_image_t1ce.shape)
+            # temp_image_t1ce = center_crop_3d(temp_image_t1ce, crop_size)
+
             # temp_combined_images = np.expand_dims(temp_image_t1ce, 0)
             return temp_image_t1ce, img_affine
         else:
             temp_mask, mask_affine = self.get_nii(filepath)
             temp_mask = np.expand_dims(temp_mask, 0)
+
+            # b, x, y, z = temp_mask.shape
+            # crop_size = (x // 2, y // 2, z // 2)
+            # temp_mask = center_crop_3d(temp_mask, crop_size)
+
             return temp_mask, mask_affine
 
     def get_nii(self, input_filename):

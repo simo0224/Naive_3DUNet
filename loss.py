@@ -1,6 +1,8 @@
 import torch.nn as nn
 import segmentation_models_pytorch_3d as smp
 import torch
+import numpy as np
+import torch.nn.functional as F
 
 class F_loss(nn.Module):
 
@@ -23,7 +25,34 @@ class F_loss(nn.Module):
         )
 
     def forward(self, output, target):
-    
+        # B, C, D, H, W = output.shape
+
+        # dice_loss = 0.0
+        # for d in range(D):
+        #     output_slice = output[:, :, d, :, :]  # [B, C, H, W]
+        #     target_slice = target[:, d, :, :]
+        #     dice_loss += self.dice_loss(output_slice, target_slice)
+        # loss1_d = dice_loss / D
+
+        # dice_loss = 0.0
+        # for h in range(H):
+        #     output_slice = output[:, :, :, h, :].contiguous()  # Ensure contiguous memory layout
+        #     target_slice = target[:, :, h, :].contiguous()  # Ensure contiguous memory layout
+        #     dice_loss += self.dice_loss(output_slice, target_slice)
+        # loss1_h = dice_loss / H
+
+        # dice_loss = 0.0
+        # for w in range(W):
+        #     output_slice = output[:, :, :, :, w]
+        #     target_slice = target[:, :, :, w]
+        #     dice_loss += self.dice_loss(output_slice, target_slice)
+        # loss1_w = dice_loss / W
+
+        # loss1 = (loss1_d + loss1_h + loss1_w) / 3.0
+
+        # print(f'Output shape: {output.shape}, Target shape: {target.shape}')
+        # print("Output unique values:", torch.unique(output))
+
         loss1 = self.dice_loss(output, target)
         loss2 = self.focal_loss(output, target)
         return loss1, loss2

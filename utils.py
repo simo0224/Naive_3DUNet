@@ -488,3 +488,98 @@ def save_model_ckpt(model, path):
         torch.save(model.module.state_dict(), path)
     else:
         torch.save(model.state_dict(), path)
+
+def Prediction_to_nii(output_dict, target_spacing, original_origin, original_direction):
+    np_array = output_dict.cpu().numpy()  # Convert to numpy array
+
+    if (np_array.ndim == 4):
+        np_array = np.argmax(np_array, axis=0)  # Convert to class labels if needed
+    elif (np_array.ndim == 3):
+        np_array = np_array
+
+    image = sitk.GetImageFromArray(np_array.astype(np.uint8))  # Convert to SimpleITK image
+    image.SetSpacing(target_spacing)  # Set target spacing
+    image.SetOrigin(original_origin)  # Set original origin
+    image.SetDirection(original_direction)  # Set original direction
+    return image  # Return the SimpleITK image
+
+def resample_image(itk_image, out_spacing, out_shape, is_label=False):
+    original_spacing = itk_image.GetSpacing()
+    original_size = itk_image.GetSize()
+    original_direction = itk_image.GetDirection()
+    original_origin = itk_image.GetOrigin()
+
+    out_size = [
+        int(round(osz * ospc / nspc))
+        for osz, ospc, nspc in zip(itk_image.GetSize(), original_spacing, out_spacing)
+    ]
+
+    resampler = sitk.ResampleImageFilter()
+    resampler.SetOutputSpacing(out_spacing)
+    resampler.SetSize(out_shape)
+    resampler.SetOutputDirection(original_direction)
+    resampler.SetOutputOrigin(original_origin)
+    resampler.SetTransform(sitk.Transform())
+    resampler.SetInterpolator(sitk.sitkLinear)  # Default interpolator
+    resampler.SetDefaultPixelValue(0)
+
+    if is_label:
+        resampler.SetInterpolator(sitk.sitkNearestNeighbor)
+        # resampler.SetInterpolator(sitk.sitkLabelGaussian)
+        # resampler.SetSigma(3.0)   # 控制边界模糊的程度，数值越大越模糊（默认1.0）
+    else:
+        resampler.SetInterpolator(sitk.sitkBSpline)
+
+    return resampler.Execute(itk_image)
+
+def Resampling_back(output_dict, original_spacing, original_origin, original_direction, original_shape, padding_info):
+
+    output_dict = output_dict.squeeze(0)  # Remove batch dimension if present
+    
+    original_origin = original_origin[0]  # Assuming original_origin is a list of lists
+    original_direction = original_direction[0]  # Assuming original_direction is a list of lists
+    original_spacing = original_spacing[0]  # Assuming original_spacing is a list of lists
+    original_shape = original_shape[0]  # Assuming original_shape is a list of lists
+
+    # Remove padding
+    print(padding_info)
+    [z0, z1]= padding_info[0][0]
+    [y0, y1] = padding_info[0][1]
+    [x0, x1] = padding_info[0][2]
+    print(f"Before removing padding: {output_dict.shape}")
+    if len(output_dict.shape) == 4:
+        output_dict = output_dict[:, z0:len(output_dict[0]) - z1, y0:len(output_dict[0][0]) - y1, x0:len(output_dict[0][0][0]) - x1]
+    else:
+        output_dict = output_dict[z0:len(output_dict) - z1, y0:len(output_dict[0]) - y1, x0:len(output_dict[0][0]) - x1]
+
+    print(f"Output shape after removing padding: {output_dict.shape}")
+    original_origin = list(map(float, original_origin))  # Convert to float
+    original_direction = list(map(float, original_direction))  # Convert to float
+    original_spacing = list(map(float, original_spacing))  # Convert to float
+    # Prediction to nii
+    pred_nii = Prediction_to_nii(output_dict, (1.0, 1.3, 1.3), original_origin, original_direction)
+
+    # Resample to original spacing
+    # original_spacing = list(map(float, original_spacing))
+    # original_shape = list(map(int, original_shape))
+
+    # resampler = sitk.ResampleImageFilter()
+    # resampler.SetOutputSpacing(original_spacing)
+    # resampler.SetSize(pred_nii.GetSize())
+    # resampler.SetOutputOrigin(pred_nii.GetOrigin())
+    # resampler.SetOutputDirection(pred_nii.GetDirection())
+
+    # resampled = resampler.Execute(pred_nii)
+    resampled = resample_image(pred_nii, original_spacing, original_shape, is_label=True)  # Resample to original spacing
+    resampled_pred = sitk.GetArrayFromImage(resampled)  # numpy: [D, H, W]
+
+    # Convert to One-Hot
+    num_classes = 2  # Assuming binary classification
+    mask = torch.tensor(resampled_pred, dtype=torch.long)  # Convert to tensor
+    one_hot_mask = torch.nn.functional.one_hot(mask, num_classes=num_classes)  # Convert to one-hot encoding
+    one_hot_mask = one_hot_mask.permute(3, 0, 1, 2).float()  # Permute to [C, D, H, W]
+
+    # one_hot_mask = torch.nn.functional.one_hot(mask_tensor, num_classes=2).permute(3, 0, 1, 2)  # Convert to one-hot encoding and permute to [C, D, H, W]
+    one_hot_mask = np.expand_dims(one_hot_mask, axis=0)  # Add batch dimension
+    one_hot_mask = torch.tensor(one_hot_mask, dtype=torch.float32)  # Convert to tensor with float32 type
+    return one_hot_mask  # Return the one-hot encoded mask tensor

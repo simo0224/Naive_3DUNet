@@ -2,7 +2,7 @@
 import torch
 from torchmetrics import MeanMetric
 import segmentation_models_pytorch_3d as smp
-from utils import cal_diceMetric_new, save_pred_nii_simple
+from utils import cal_diceMetric_new, save_pred_nii_simple, Resampling_back, get_default_device, seed_everything
 from tqdm import tqdm
 import numpy as np
 from config import *
@@ -30,11 +30,13 @@ def train_one_epoch(
 
     # with tqdm(total=loader_len, ncols=120) as tq:
         # tq.set_description(f"Train :: Epoch {epoch_idx}/{total_epochs}")
-    for iter_, (data, target, mask_affines, save_path_nii, mask_crop_idx, tp_names) in enumerate(loader):
+    for iter_, batch in enumerate(loader):
         # tq.update(1)
         # if iter_ >=4:
         #     break
-        data, target = data.to(device).float(), target.to(device).long()
+        image = batch['image']
+        target = batch['mask']
+        data, target = image.to(device).float(), target.to(device).long()
         print(f"input data.shape: {data.shape}")
         print(f"input mask.shape: {target.shape}")
 
@@ -61,10 +63,10 @@ def train_one_epoch(
         optimizer.step()
 
         with torch.no_grad():
-            if (epoch_idx % opt.save_nii_freq == 0 and epoch_idx != 0) or (epoch_idx == total_epochs - 1):
-            # if True:
-                if opt.if_save_nii:
-                    save_pred_nii_simple(clsfy_out, epoch_idx, save_path_nii, mask_affines, mask_crop_idx, mod=opt.mod)
+            # if (epoch_idx % opt.save_nii_freq == 0 and epoch_idx != 0) or (epoch_idx == total_epochs - 1):
+            # # if True:
+            #     if opt.if_save_nii:
+            #         save_pred_nii_simple(clsfy_out, epoch_idx, save_path_nii, mask_affines, mask_crop_idx, mod=opt.mod)
 
 
             if opt.mod == 'long':
@@ -135,10 +137,14 @@ def validate(
     loader_len = len(loader)
     
     
-    for iter_, (data, target, mask_affines, save_path_nii, mask_crop_idx, tp_names) in enumerate(loader):
+    # for iter_, (data, target, mask_affines, save_path_nii, mask_crop_idx, tp_names) in enumerate(loader):
+    for iter_, batch in enumerate(loader):
         # if iter_ >=4:
         #     break
-        data, target = data.to(device).float(), target.to(device).long()
+        # data, target = data.to(device).float(), target.to(device).long()
+        image = batch['image']
+        target = batch['mask']
+        data, target = image.to(device).float(), target.to(device).long()
 
         with torch.no_grad():
             need_inter = False
@@ -146,16 +152,24 @@ def validate(
                 need_inter = True
 
             output_dict = model(data, need_inter)
-            if (epoch_idx % opt.save_nii_freq == 0 and epoch_idx != 0) or (epoch_idx == total_epochs - 1):
-            # if True:
-                if opt.if_save_nii:
-                    save_pred_nii_simple(output_dict, epoch_idx, save_path_nii, mask_affines, mask_crop_idx, mod=opt.mod)
+            # if (epoch_idx % opt.save_nii_freq == 0 and epoch_idx != 0) or (epoch_idx == total_epochs - 1):
+            # # if True:
+            #     if opt.if_save_nii:
+            #         save_pred_nii_simple(output_dict, epoch_idx, save_path_nii, mask_affines, mask_crop_idx, mod=opt.mod)
+        
+        print(f"Prediction is {output_dict.shape}") ## [B, C, D*2, H, W]
+        output_dict = Resampling_back(output_dict, batch['original_spacing'], batch['original_origin'], batch['original_direction'], batch['original_shape'], batch['padding_info'])
 
+        print(output_dict.shape) ## [B, C, D*2, H, W]
+        print(target.shape) ## [B, D, H, W]
         clsfy_out = output_dict
+        print(f"pred size is {clsfy_out.shape}") ## [B, C, D*2, H, W]
         if opt.mod == 'long':
             tp2_target = target[:,1,::]
             loss_dice, loss_focus = criterion(clsfy_out, tp2_target)
         else:
+            DEVICE, _= get_default_device(opt.gpu_id)
+            clsfy_out = clsfy_out.to(DEVICE)
             loss_dice, loss_focus = criterion(clsfy_out, target)
 
         if opt.mod == 'long':

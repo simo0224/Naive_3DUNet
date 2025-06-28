@@ -8,7 +8,7 @@ OUTPUT_DIR="./output"
 # DATA_DIR="/home/jincan/long_seg/my3DUNet/Data/Brats2024/Brats_Data/Train_split"
 # DATA_DIR="/home/jincan/long_seg/my3DUNet/Data/Imaging/Imaging_for_3DUNet_single_new"
 # DATA_DIR="/home/jincan/long_seg/my3DUNet/Data/Imaging_data/Combined_Imaging"
-DATA_DIR="/home/lihang/Naive_3DUNet/padding_data"
+DATA_DIR="/data/hdc/jincan/long_seg/MICCAI25/Resampling"
 # DATA_DIR="/home/lihang/Naive_3DUNet/30labeled"
 # 启动训练脚本
 # CUDA_VISIBLE_DEVICES=1

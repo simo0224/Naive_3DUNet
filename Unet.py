@@ -144,7 +144,7 @@ class UNet3D(nn.Module):
         #     return [output1, output2]
         # else:
         if need_inter:
-            outputs = F.interpolate(outputs, scale_factor=2, mode='trilinear', align_corners=True)
+            outputs = F.interpolate(outputs, scale_factor=1.25, mode='trilinear', align_corners=True)
 
         return outputs
 

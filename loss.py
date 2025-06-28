@@ -50,7 +50,7 @@ class F_loss(nn.Module):
 
         # loss1 = (loss1_d + loss1_h + loss1_w) / 3.0
 
-        # print(f'Output shape: {output.shape}, Target shape: {target.shape}')
+        print(f'Output shape: {output.shape}, Target shape: {target.shape}')
         # print("Output unique values:", torch.unique(output))
 
         loss1 = self.dice_loss(output, target)
